@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+commit_regex="^(feat|fix|docs|style|refactor|test|chore|ci|build|perf|revert|init|merge|release|security|hotfix): [A-Z][A-Za-z0-9-]"
+if ! grep -qE "$commit_regex" "$1"; then
+  echo "Commit message should follow the pattern: 'type: Message'"
+  exit 1
+fi
+
+commit_regex2=" .*\(?#[0-9]+\)? ?$"
+
+if ! grep -qE "$commit_regex2" "$1"; then
+  echo "Commit message should reference an issue. Aborting commit."
+  exit 1
+fi

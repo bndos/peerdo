@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+branch_regex="^(main|development|master|(feature|test|(bug|hot)fix)(/[a-zA-Z0-9]+([-_][a-zA-Z0-9]+)*){1,2}|release/[0-9]+(\.[0-9]+)*(-(alpha|beta|rc)[0-9]*)?)$"
+
+branch_name=$(git symbolic-ref --short HEAD)
+
+if ! $(echo $(git rev-parse --abbrev-ref HEAD) | grep -q -E "$branch_regex"); then
+  echo "Branch name must match regex: $branch_regex \n example: feature/feature-name, bugfix/bugfix-name, release/1.0.0, hotfix/1.0.1, feature/123/feature-name..."
+  exit 1
+fi
+
 npm run lint && npm run prettier-check

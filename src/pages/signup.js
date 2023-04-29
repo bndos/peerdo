@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Checkbox,
   Container,
   Divider,
   FormControl,
@@ -22,8 +21,8 @@ import {
 } from "@chakra-ui/react";
 import { forwardRef, useRef, useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import { GitHubIcon, GoogleIcon, TwitterIcon } from "./OAuthIcons";
 import LinkItem from "../components/link-item";
+import { GitHubIcon, GoogleIcon, TwitterIcon } from "./OAuthIcons";
 
 const providers = [
   {

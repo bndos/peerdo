@@ -29,6 +29,17 @@ const components = {
       textUnderlineOffset: 3,
     }),
   },
+  Button: {
+    variants: {
+      custom: (props) => ({
+        bg: mode("blue.500", "blue.200")(props),
+        color: mode("white", "black")(props),
+        _hover: {
+          bg: mode("blue.700", "blue.400")(props),
+        },
+      }),
+    },
+  },
 };
 
 const fonts = {

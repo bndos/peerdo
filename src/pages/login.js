@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { forwardRef, useRef } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import { GitHubIcon, GoogleIcon, TwitterIcon } from "./OAuthIcons";
+import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
 import LinkItem from "../components/link-item";
 
 const providers = [

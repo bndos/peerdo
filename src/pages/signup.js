@@ -22,7 +22,7 @@ import {
 import { forwardRef, useRef, useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import LinkItem from "../components/link-item";
-import { GitHubIcon, GoogleIcon, TwitterIcon } from "./OAuthIcons";
+import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
 
 const providers = [
   {

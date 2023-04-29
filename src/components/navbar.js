@@ -7,29 +7,9 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import Logo from "./logo";
-import NextLink from "next/link";
+import LinkItem from "./link-item";
 import ThemeToggleButton from "./theme-toggle-button";
-
-const LinkItem = ({ href, path, target, children, ...props }) => {
-  const active = path === href;
-  const inactiveColor = useColorModeValue("gray200", "whiteAlpha.900");
-  return (
-    <Link
-      as={NextLink}
-      href={href}
-      scroll={false}
-      p={2}
-      bg={active ? "grassTeal" : undefined}
-      color={active ? "#202023" : inactiveColor}
-      target={target}
-      {...props}
-    >
-      {children}
-    </Link>
-  );
-};
 
 const Navbar = (props) => {
   const { path } = props;

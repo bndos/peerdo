@@ -2,10 +2,10 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Checkbox,
   Container,
   Divider,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
   Heading,
@@ -19,10 +19,10 @@ import {
   useDisclosure,
   useMergeRefs,
 } from "@chakra-ui/react";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
-import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
 import LinkItem from "../components/link-item";
+import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
 
 const providers = [
   {
@@ -62,9 +62,24 @@ const PasswordField = forwardRef((props, ref) => {
       });
     }
   };
+
+  const [isValid, setIsValid] = useState(false);
+  const validatePassword = (value) => {
+    if (value.length < 8) {
+      setIsValid(false);
+    } else {
+      setIsValid(true);
+    }
+  };
+
   return (
-    <FormControl>
-      <FormLabel htmlFor="password">Password</FormLabel>
+    <FormControl isInvalid={!isValid}>
+      <FormLabel htmlFor="password">
+        Password{" "}
+        <Text as="span" color="#FF6B6B">
+          *
+        </Text>
+      </FormLabel>
       <InputGroup>
         <InputRightElement>
           <IconButton
@@ -81,17 +96,23 @@ const PasswordField = forwardRef((props, ref) => {
           type={isOpen ? "text" : "password"}
           autoComplete="current-password"
           required
+          onBlur={(e) => validatePassword(e.target.value)}
           {...props}
         />
       </InputGroup>
+      {!isValid && (
+        <FormErrorMessage>
+          Password must be at least 8 characters long
+        </FormErrorMessage>
+      )}
     </FormControl>
   );
 });
+
 PasswordField.displayName = "PasswordField";
 
-const Login = (props) => {
+const Signup = (props) => {
   const { path } = props;
-
   return (
     <Container
       maxW="lg"
@@ -120,13 +141,13 @@ const Login = (props) => {
                 md: "sm",
               }}
             >
-              Log in to your account
+              Create an account
             </Heading>
             <HStack spacing="1" justify="center">
-              <Text color="muted">Don &apos;t have an account?</Text>
-              <LinkItem href="/signup" path={path}>
+              <Text color="muted">Already have an account?</Text>
+              <LinkItem href="/login" path={path}>
                 <Button variant="link" colorScheme="blue">
-                  Sign up
+                  Login
                 </Button>
               </LinkItem>
             </HStack>
@@ -158,23 +179,23 @@ const Login = (props) => {
           <Stack spacing="6">
             <Stack spacing="5">
               <FormControl>
-                <FormLabel htmlFor="email">Email</FormLabel>
+                <FormLabel htmlFor="email">
+                  Email{" "}
+                  <Text as="span" color="#FF6B6B">
+                    *
+                  </Text>
+                </FormLabel>
+
                 <Input id="email" type="email" />
               </FormControl>
               <PasswordField />
             </Stack>
-            <HStack justify="space-between">
-              <Checkbox defaultChecked>Remember me</Checkbox>
-              <Button variant="link" colorScheme="blue" size="sm">
-                Forgot password?
-              </Button>
-            </HStack>
             <Stack spacing="6">
-              <Button variant="custom">Sign in</Button>
+              <Button variant="custom">Create account</Button>
               <HStack>
                 <Divider />
                 <Text fontSize="sm" whiteSpace="nowrap" color="muted">
-                  or login with
+                  or sign up with
                 </Text>
                 <Divider />
               </HStack>
@@ -187,4 +208,4 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+export default Signup;

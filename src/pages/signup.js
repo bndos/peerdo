@@ -24,6 +24,7 @@ import { HiEye, HiEyeOff } from "react-icons/hi";
 import { auth } from "../lib/firebase";
 import LinkItem from "../components/link-item";
 import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
+import { useRouter } from "next/router";
 
 const providers = [
   {
@@ -113,6 +114,7 @@ const PasswordField = forwardRef((props, ref) => {
 PasswordField.displayName = "PasswordField";
 
 const Signup = (props) => {
+  const router = useRouter();
   const { path } = props;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -211,6 +213,7 @@ const Signup = (props) => {
                       // User account created successfully
                       const user = userCredential.user;
                       console.log("User account created successfully:", user);
+                      router.push("/home"); // Redirect to home page
                     })
                     .catch((error) => {
                       // An error occurred

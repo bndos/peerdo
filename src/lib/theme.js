@@ -40,6 +40,20 @@ const components = {
       }),
     },
   },
+  Box: {
+    variants: {
+      call: (props) => ({
+        bg: mode("gray.50", "gray.900")(props),
+        color: mode("gray.800", "white")(props),
+      }),
+    },
+  },
+  IconButton: {
+    defaultProps: {
+      variant: "call",
+      colorScheme: "gray",
+    },
+  },
 };
 
 const fonts = {

@@ -19,10 +19,12 @@ import {
   useDisclosure,
   useMergeRefs,
 } from "@chakra-ui/react";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
 import LinkItem from "../components/link-item";
+import { useRouter } from "next/router";
+import { auth } from "../lib/firebase";
 
 const providers = [
   {
@@ -90,7 +92,10 @@ const PasswordField = forwardRef((props, ref) => {
 PasswordField.displayName = "PasswordField";
 
 const Login = (props) => {
+  const router = useRouter();
   const { path } = props;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <Container
@@ -159,9 +164,16 @@ const Login = (props) => {
             <Stack spacing="5">
               <FormControl>
                 <FormLabel htmlFor="email">Email</FormLabel>
-                <Input id="email" type="email" />
+                <Input
+                  id="email"
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </FormControl>
-              <PasswordField />
+              <PasswordField
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </Stack>
             <HStack justify="space-between">
               <Checkbox defaultChecked>Remember me</Checkbox>
@@ -170,7 +182,31 @@ const Login = (props) => {
               </Button>
             </HStack>
             <Stack spacing="6">
-              <Button variant="custom">Sign in</Button>
+              <Button
+                variant="custom"
+                onClick={() => {
+                  auth
+                    .signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                      // Sign in successful
+                      const user = userCredential.user;
+                      console.log("User signed in successfully:", user);
+                      router.push("/home");
+                    })
+                    .catch((error) => {
+                      // Sign in failed
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      console.error(
+                        "Error signing in:",
+                        errorCode,
+                        errorMessage
+                      );
+                    });
+                }}
+              >
+                Sign in
+              </Button>
               <HStack>
                 <Divider />
                 <Text fontSize="sm" whiteSpace="nowrap" color="muted">

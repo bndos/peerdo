@@ -21,8 +21,10 @@ import {
 } from "@chakra-ui/react";
 import { forwardRef, useRef, useState } from "react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import { auth } from "../lib/firebase";
 import LinkItem from "../components/link-item";
 import { GitHubIcon, GoogleIcon, TwitterIcon } from "../components/oauth-icons";
+import { useRouter } from "next/router";
 
 const providers = [
   {
@@ -112,7 +114,11 @@ const PasswordField = forwardRef((props, ref) => {
 PasswordField.displayName = "PasswordField";
 
 const Signup = (props) => {
+  const router = useRouter();
   const { path } = props;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <Container
       maxW="lg"
@@ -186,12 +192,43 @@ const Signup = (props) => {
                   </Text>
                 </FormLabel>
 
-                <Input id="email" type="email" />
+                <Input
+                  id="email"
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </FormControl>
-              <PasswordField />
+              <PasswordField
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </Stack>
             <Stack spacing="6">
-              <Button variant="custom">Create account</Button>
+              <Button
+                variant="custom"
+                onClick={() => {
+                  auth
+                    .createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                      // User account created successfully
+                      const user = userCredential.user;
+                      console.log("User account created successfully:", user);
+                      router.push("/home"); // Redirect to home page
+                    })
+                    .catch((error) => {
+                      // An error occurred
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      console.error(
+                        "Error creating user account:",
+                        errorCode,
+                        errorMessage
+                      );
+                    });
+                }}
+              >
+                Create account
+              </Button>
               <HStack>
                 <Divider />
                 <Text fontSize="sm" whiteSpace="nowrap" color="muted">

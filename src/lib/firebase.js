@@ -11,7 +11,6 @@ const firebaseConfig = {
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID,
 };
-console.log(firebaseConfig);
 
 // Initialize Firebase
 if (!firebase.apps.length) {

@@ -203,7 +203,7 @@ const Room = () => {
               overflow="hidden"
             >
               {videoEnabled ? (
-                <video ref={videoRef} />
+                <video ref={videoRef} autoPlay />
               ) : (
                 <Img src="/images/inattention.png" />
               )}
@@ -218,7 +218,7 @@ const Room = () => {
               mx="auto" // add mx="auto" to center horizontally
               overflow="hidden"
             >
-              {shareScreenEnabled && <video ref={shareScreenRef} />}
+              {shareScreenEnabled && <video autoPlay ref={shareScreenRef} />}
             </Box>
           </HStack>
 

@@ -58,12 +58,16 @@ const Room = () => {
   const shareScreenRef = useRef(null);
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-      setUser(currentUser);
-    } else {
-      router.push("/login");
-    }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        console.log("No user found", user);
+        router.push("/login");
+      }
+    });
+
+    return () => unsubscribe();
   }, [router]);
 
   const boxStyle = useStyleConfig("Box", { variant: "call" });

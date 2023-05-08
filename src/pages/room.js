@@ -7,12 +7,13 @@ import {
   Heading,
   HStack,
   IconButton,
+  Img,
   Input,
   useStyleConfig,
 } from "@chakra-ui/react";
 
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaCog,
   FaDesktop,
@@ -22,8 +23,8 @@ import {
   FaVideoSlash,
 } from "react-icons/fa";
 
-import { auth, firestore } from "../lib/firebase";
 import { serverTimestamp } from "firebase/firestore";
+import { auth, firestore } from "../lib/firebase";
 
 const DisplaySlashIcon = (props) => (
   <svg viewBox="0 0 640 512" {...props}>
@@ -53,14 +54,14 @@ const Room = () => {
   const [shareScreenEnabled, setShareScreenEnabled] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [loading, setLoading] = useState(false);
+  const videoRef = useRef(null);
+  const shareScreenRef = useRef(null);
 
   useEffect(() => {
-    // Get the currently logged in user's email address
     const currentUser = auth.currentUser;
     if (currentUser) {
       setUser(currentUser);
     } else {
-      // If there is no logged in user, redirect to login page
       router.push("/login");
     }
   }, [router]);
@@ -81,34 +82,48 @@ const Room = () => {
       console.error("Error getting audio device", error);
     }
   };
-
   const handleVideoToggle = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setVideoEnabled(!videoEnabled);
       if (videoEnabled) {
-        stream.getVideoTracks()[0].enabled = false;
+        // Stop the screen sharing stream and switch back to the camera stream
+        const stream = videoRef.current.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => {
+          track.stop();
+        });
+        videoRef.current.srcObject = null;
+        console.log("Stopped screen sharing");
       } else {
-        stream.getVideoTracks()[0].enabled = true;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        // Switch to the screen sharing stream
+        videoRef.current.srcObject = stream;
       }
     } catch (error) {
-      console.error("Error getting video device", error);
+      console.error("Error sharing screen", error);
     }
   };
 
   const handleShareScreenToggle = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-      });
       setShareScreenEnabled(!shareScreenEnabled);
       if (shareScreenEnabled) {
-        stream.getVideoTracks()[0].stop();
+        // Stop the screen sharing stream and switch back to the camera stream
+        const stream = shareScreenRef.current.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => {
+          track.stop();
+        });
+        shareScreenRef.current.srcObject = null;
+        console.log("Stopped screen sharing");
       } else {
-        const sender = peerConnection
-          .getSenders()
-          .find((s) => s.track.kind === "video");
-        sender.replaceTrack(stream.getVideoTracks()[0]);
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+        });
+        // Switch to the screen sharing stream
+        shareScreenRef.current.srcObject = stream;
       }
     } catch (error) {
       console.error("Error sharing screen", error);
@@ -175,7 +190,39 @@ const Room = () => {
               Create
             </Button>
           </Flex>
-          <HStack spacing="4" justifyContent="space-evenly">
+
+          <HStack pt="2" spacing="4" justifyContent="space-evenly">
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="10%"
+              maxW={{ base: "50%", md: "40%" }}
+              maxH={{ base: "50%", md: "40%" }}
+              mx="auto" // add mx="auto" to center horizontally
+              overflow="hidden"
+            >
+              {videoEnabled ? (
+                <video ref={videoRef} />
+              ) : (
+                <Img src="/images/inattention.png" />
+              )}
+            </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              borderRadius="10%"
+              maxW={{ base: "50%", md: "40%" }}
+              maxH={{ base: "50%", md: "40%" }}
+              mx="auto" // add mx="auto" to center horizontally
+              overflow="hidden"
+            >
+              {shareScreenEnabled && <video ref={shareScreenRef} />}
+            </Box>
+          </HStack>
+
+          <HStack pt="2" spacing="4" justifyContent="space-evenly">
             <IconButton
               sx={iconButtonStyle}
               aria-label="Toggle audio"

@@ -22,7 +22,8 @@ import {
   FaVideoSlash,
 } from "react-icons/fa";
 
-import { auth } from "../lib/firebase";
+import { auth, firestore } from "../lib/firebase";
+import { serverTimestamp } from "firebase/firestore";
 
 const DisplaySlashIcon = (props) => (
   <svg viewBox="0 0 640 512" {...props}>
@@ -38,7 +39,7 @@ const DisplaySlashIcon = (props) => (
       x1="639"
       y1="-64"
       stroke="currentColor"
-      stroke-width="64"
+      strokeWidth="64"
       transform="rotate(90, 303.5, 223.5)"
     />
   </svg>
@@ -50,6 +51,8 @@ const Room = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
   const [shareScreenEnabled, setShareScreenEnabled] = useState(false);
+  const [roomName, setRoomName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Get the currently logged in user's email address
@@ -112,6 +115,30 @@ const Room = () => {
     }
   };
 
+  const handleCreateRoom = async () => {
+    setLoading(true);
+
+    try {
+      const roomRef = await firestore.collection("rooms").add({
+        name: roomName,
+        createdAt: serverTimestamp(),
+      });
+
+      setLoading(false);
+      router.push({
+        pathname: "/[roomId]",
+        query: { roomId: roomRef.id },
+      });
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
+
+  const handleRoomNameChange = (event) => {
+    setRoomName(event.target.value);
+  };
+
   return (
     <div>
       {user ? (
@@ -131,9 +158,20 @@ const Room = () => {
           <Flex flexDirection="column" mb="4">
             <FormControl id="room-name">
               <FormLabel textAlign="center">Room name</FormLabel>
-              <Input type="text" placeholder="Enter code" />
+              <Input
+                type="text"
+                placeholder="Enter room name"
+                onChange={handleRoomNameChange}
+                value={roomName}
+              />
             </FormControl>
-            <Button variant="custom" width="100%" mt="2">
+            <Button
+              variant="custom"
+              width="100%"
+              mt="2"
+              onClick={handleCreateRoom}
+              isLoading={loading}
+            >
               Create
             </Button>
           </Flex>

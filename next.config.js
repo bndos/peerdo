@@ -9,4 +9,12 @@ module.exports = {
     config.plugins.push(new webpack.EnvironmentPlugin(env));
     return config;
   },
+  async rewrites() {
+    return [
+      {
+        source: "/room/:id",
+        destination: "/[roomId]?id=:id",
+      },
+    ];
+  },
 };

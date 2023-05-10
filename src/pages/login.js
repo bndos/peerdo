@@ -191,7 +191,7 @@ const Login = (props) => {
                       // Sign in successful
                       const user = userCredential.user;
                       console.log("User signed in successfully:", user);
-                      router.push("/room");
+                      router.push("/rooms");
                     })
                     .catch((error) => {
                       // Sign in failed

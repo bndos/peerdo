@@ -213,7 +213,7 @@ const Signup = (props) => {
                       // User account created successfully
                       const user = userCredential.user;
                       console.log("User account created successfully:", user);
-                      router.push("/room");
+                      router.push("/rooms");
                     })
                     .catch((error) => {
                       // An error occurred

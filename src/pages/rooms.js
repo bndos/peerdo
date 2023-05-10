@@ -46,7 +46,7 @@ const DisplaySlashIcon = (props) => (
   </svg>
 );
 
-const Room = () => {
+const Rooms = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
@@ -145,8 +145,8 @@ const Room = () => {
 
       setLoading(false);
       router.push({
-        pathname: "/[roomId]",
-        query: { roomId: roomRef.id },
+        pathname: "/room/[room]",
+        query: { room: roomRef.id },
       });
     } catch (error) {
       console.error(error);
@@ -266,4 +266,4 @@ const Room = () => {
   );
 };
 
-export default Room;
+export default Rooms;

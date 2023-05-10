@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Box, IconButton, HStack, Img } from "@chakra-ui/react";
+import { Box, IconButton, HStack, Img, VStack } from "@chakra-ui/react";
 import {
   FaMicrophone,
   FaMicrophoneSlash,
@@ -37,7 +37,9 @@ const CallControl = () => {
   const [shareScreenEnabled, setShareScreenEnabled] = useState(false);
   const videoRef = useRef(null);
   const shareScreenRef = useRef(null);
+
   const iconButtonStyle = useStyleConfig("IconButton", { variant: "call" });
+  const callControlStyle = useStyleConfig("Box", { variant: "callControl" });
 
   const handleAudioToggle = async () => {
     try {
@@ -100,70 +102,71 @@ const CallControl = () => {
     }
   };
   return (
-    <>
-      <HStack pt="2" spacing="4" justifyContent="space-evenly">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          borderRadius="10%"
-          maxW={{ base: "50%", md: "40%" }}
-          maxH={{ base: "50%", md: "40%" }}
-          mx="auto" // add mx="auto" to center horizontally
-          overflow="hidden"
-        >
-          {videoEnabled ? (
-            <video ref={videoRef} autoPlay />
-          ) : (
-            <Img src="/images/inattention.png" />
-          )}
-        </Box>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          borderRadius="10%"
-          maxW={{ base: "50%", md: "40%" }}
-          maxH={{ base: "50%", md: "40%" }}
-          mx="auto" // add mx="auto" to center horizontally
-          overflow="hidden"
-        >
-          {shareScreenEnabled && <video autoPlay ref={shareScreenRef} />}
-        </Box>
-      </HStack>
-
-      <HStack pt="2" spacing="4" justifyContent="space-evenly">
-        <IconButton
-          sx={iconButtonStyle}
-          aria-label="Toggle audio"
-          icon={audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-          onClick={handleAudioToggle}
-        />
-        <IconButton
-          sx={iconButtonStyle}
-          aria-label="Toggle video"
-          icon={videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-          onClick={handleVideoToggle}
-        />
-        <IconButton
-          sx={iconButtonStyle}
-          aria-label="Share screen"
-          icon={
-            shareScreenEnabled ? (
-              <FaDesktop />
+    <Box sx={callControlStyle} p="1" borderRadius="md" m="4">
+      <VStack>
+        <HStack pt="1" spacing="1" justifyContent="space-evenly">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            borderRadius="10%"
+            maxW={{ base: "70%", md: "60%" }}
+            maxH={{ base: "70%", md: "60%" }}
+            mx="auto" // add mx="auto" to center horizontally
+            overflow="hidden"
+          >
+            {videoEnabled ? (
+              <video ref={videoRef} autoPlay />
             ) : (
-              <DisplaySlashIcon width="1em" height="1em" />
-            )
-          }
-          onClick={handleShareScreenToggle}
-        />
-        <IconButton
-          sx={iconButtonStyle}
-          aria-label="Settings"
-          icon={<FaCog />}
-        />
-      </HStack>
-    </>
+              <Img src="/images/inattention.png" />
+            )}
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            borderRadius="10%"
+            maxW={{ base: "70%", md: "60%" }}
+            maxH={{ base: "70%", md: "60%" }}
+            mx="auto" // add mx="auto" to center horizontally
+            overflow="hidden"
+          >
+            {shareScreenEnabled && <video autoPlay ref={shareScreenRef} />}
+          </Box>
+        </HStack>
+        <HStack pt="0" spacing="1" justifyContent="space-evenly">
+          <IconButton
+            sx={iconButtonStyle}
+            aria-label="Toggle audio"
+            icon={audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+            onClick={handleAudioToggle}
+          />
+          <IconButton
+            sx={iconButtonStyle}
+            aria-label="Toggle video"
+            icon={videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+            onClick={handleVideoToggle}
+          />
+          <IconButton
+            sx={iconButtonStyle}
+            aria-label="Share screen"
+            icon={
+              shareScreenEnabled ? (
+                <FaDesktop />
+              ) : (
+                <DisplaySlashIcon width="1em" height="1em" />
+              )
+            }
+            onClick={handleShareScreenToggle}
+          />
+          <IconButton
+            sx={iconButtonStyle}
+            aria-label="Settings"
+            icon={<FaCog />}
+          />
+        </HStack>
+      </VStack>
+    </Box>
   );
 };
 

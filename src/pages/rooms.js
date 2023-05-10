@@ -6,6 +6,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  useStyleConfig,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -18,6 +19,8 @@ const Rooms = () => {
   const [user, setUser] = useState(null);
   const [roomName, setRoomName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const boxStyle = useStyleConfig("Box", { variant: "call" });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -60,6 +63,7 @@ const Rooms = () => {
     <div>
       {user ? (
         <Box
+          sx={boxStyle}
           position="fixed"
           top="0"
           left="0"
@@ -97,7 +101,6 @@ const Rooms = () => {
       ) : (
         <h1>Please sign in to continue</h1>
       )}
-      {/* Other room page content here */}
     </div>
   );
 };

@@ -1,5 +1,7 @@
+import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import CallControl from "../../components/call-control";
 import { firestore } from "../../lib/firebase";
 
 const Room = () => {
@@ -30,6 +32,11 @@ const Room = () => {
 
     getRoomName();
   }, [room]);
+  const CallControlContainer = (props) => (
+    <Box w="250px" borderRadius="10px" p="0">
+      <CallControl {...props} />
+    </Box>
+  );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -40,10 +47,17 @@ const Room = () => {
   }
 
   return (
-    <div>
-      <h1>Room ID: {room}</h1>
-      <h2>Room Name: {roomName}</h2>
-    </div>
+    <VStack>
+      <Text>Room: {roomName}</Text>
+      <Box w="100%">
+        <HStack justifyContent="center" alignItems="center">
+          <CallControlContainer />
+        </HStack>
+      </Box>
+      <Box flex="1" w="100%">
+        {/* Add video grid here */}
+      </Box>
+    </VStack>
   );
 };
 

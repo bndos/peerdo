@@ -46,6 +46,10 @@ const components = {
         bg: mode("gray.50", "gray.900")(props),
         color: mode("gray.800", "white")(props),
       }),
+      callControl: (props) => ({
+        bg: mode("gray.300", "gray.700")(props),
+        color: mode("gray.800", "white")(props),
+      }),
     },
   },
   IconButton: {

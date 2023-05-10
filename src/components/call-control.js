@@ -33,84 +33,89 @@ const DisplaySlashIcon = (props) => (
 
 const CallControl = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [audioStream, setAudioStream] = useState(null);
   const [videoEnabled, setVideoEnabled] = useState(false);
+  const [videoStream, setVideoStream] = useState(null);
   const [shareScreenEnabled, setShareScreenEnabled] = useState(false);
+  const [shareScreenStream, setShareScreenStream] = useState(null);
+
   const videoRef = useRef(null);
   const shareScreenRef = useRef(null);
 
   const iconButtonStyle = useStyleConfig("IconButton", { variant: "call" });
   const callControlStyle = useStyleConfig("Box", { variant: "callControl" });
 
-  const [audioStream, setAudioStream] = useState(null);
-
-  const handleAudioToggle = async () => {
+  const toggleStream = async (
+    enabled,
+    setEnabled,
+    stream,
+    setStream,
+    ref,
+    constraints
+  ) => {
     try {
-      setAudioEnabled(!audioEnabled);
-      if (audioEnabled) {
-        if (audioStream) {
-          const tracks = audioStream.getTracks();
-          tracks.forEach((track) => {
-            track.stop();
-          });
-          setAudioStream(null);
-          console.log("Stopped audio");
-        }
-      } else {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+      setEnabled(!enabled);
+      if (enabled) {
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => {
+          track.stop();
         });
-        setAudioStream(stream);
+        if (ref && ref.current) {
+          ref.current.srcObject = null;
+        }
+        setStream(null);
+      } else {
+        const newStream = await navigator.mediaDevices.getUserMedia(
+          constraints
+        );
+        setStream(newStream);
+        if (ref && ref.current) {
+          ref.current.srcObject = newStream;
+        }
       }
     } catch (error) {
-      console.error("Error toggling audio", error);
+      setEnabled(false);
+      console.error("Error toggling stream", error);
     }
+  };
+
+  const handleAudioToggle = async () => {
+    toggleStream(
+      audioEnabled,
+      setAudioEnabled,
+      audioStream,
+      setAudioStream,
+      null,
+      {
+        audio: true,
+      }
+    );
   };
 
   const handleVideoToggle = async () => {
-    try {
-      setVideoEnabled(!videoEnabled);
-      if (videoEnabled) {
-        const stream = videoRef.current.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => {
-          track.stop();
-        });
-        videoRef.current.srcObject = null;
-        console.log("Stopped screen sharing");
-      } else {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        videoRef.current.srcObject = stream;
+    toggleStream(
+      videoEnabled,
+      setVideoEnabled,
+      videoStream,
+      setVideoStream,
+      videoRef,
+      {
+        video: true,
       }
-    } catch (error) {
-      console.error("Error sharing screen", error);
-    }
+    );
   };
 
   const handleShareScreenToggle = async () => {
-    try {
-      setShareScreenEnabled(!shareScreenEnabled);
-      if (shareScreenEnabled) {
-        // Stop the screen sharing stream and switch back to the camera stream
-        const stream = shareScreenRef.current.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => {
-          track.stop();
-        });
-        shareScreenRef.current.srcObject = null;
-        console.log("Stopped screen sharing");
-      } else {
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: true,
-        });
-        // Switch to the screen sharing stream
-        shareScreenRef.current.srcObject = stream;
-      }
-    } catch (error) {
-      console.error("Error sharing screen", error);
-    }
+    toggleStream(
+      shareScreenEnabled,
+      setShareScreenEnabled,
+      shareScreenStream,
+      setShareScreenStream,
+      shareScreenRef,
+      { video: { mediaSource: "screen" } }
+    );
   };
+
   return (
     <Box sx={callControlStyle} p="1" borderRadius="md" m="4">
       <VStack>

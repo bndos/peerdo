@@ -13,7 +13,7 @@ module.exports = {
     return [
       {
         source: "/room/:id",
-        destination: "/[roomId]?id=:id",
+        destination: "/room/[room]?room=:id",
       },
     ];
   },

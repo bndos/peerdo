@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Box, IconButton, HStack, Img, VStack } from "@chakra-ui/react";
 import {
   FaMicrophone,
@@ -31,13 +31,21 @@ const DisplaySlashIcon = (props) => (
   </svg>
 );
 
-const CallControl = () => {
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [audioStream, setAudioStream] = useState(null);
-  const [videoEnabled, setVideoEnabled] = useState(false);
-  const [videoStream, setVideoStream] = useState(null);
-  const [shareScreenEnabled, setShareScreenEnabled] = useState(false);
-  const [shareScreenStream, setShareScreenStream] = useState(null);
+const CallControl = (options) => {
+  const [audioEnabled, setAudioEnabled] = useState(
+    options.audioEnabled || false
+  );
+  const [videoEnabled, setVideoEnabled] = useState(
+    options.videoEnabled || false
+  );
+  const [shareScreenEnabled, setShareScreenEnabled] = useState(
+    options.shareScreenEnabled || false
+  );
+  const [audioStream, setAudioStream] = useState(options.audioStream || null);
+  const [videoStream, setVideoStream] = useState(options.videoStream || null);
+  const [shareScreenStream, setShareScreenStream] = useState(
+    options.shareScreenStream || null
+  );
 
   const videoRef = useRef(null);
   const shareScreenRef = useRef(null);
@@ -45,12 +53,23 @@ const CallControl = () => {
   const iconButtonStyle = useStyleConfig("IconButton", { variant: "call" });
   const callControlStyle = useStyleConfig("Box", { variant: "callControl" });
 
+  useEffect(() => {
+    if (videoStream && videoRef.current) {
+      videoRef.current.srcObject = videoStream;
+    }
+  }, [videoStream]);
+
+  useEffect(() => {
+    if (shareScreenStream && shareScreenRef.current) {
+      shareScreenRef.current.srcObject = shareScreenStream;
+    }
+  }, [shareScreenStream]);
+
   const toggleStream = async (
     enabled,
     setEnabled,
     stream,
     setStream,
-    ref,
     constraints
   ) => {
     try {
@@ -60,18 +79,12 @@ const CallControl = () => {
         tracks.forEach((track) => {
           track.stop();
         });
-        if (ref && ref.current) {
-          ref.current.srcObject = null;
-        }
         setStream(null);
       } else {
         const newStream = await navigator.mediaDevices.getUserMedia(
           constraints
         );
         setStream(newStream);
-        if (ref && ref.current) {
-          ref.current.srcObject = newStream;
-        }
       }
     } catch (error) {
       setEnabled(false);
@@ -80,29 +93,15 @@ const CallControl = () => {
   };
 
   const handleAudioToggle = async () => {
-    toggleStream(
-      audioEnabled,
-      setAudioEnabled,
-      audioStream,
-      setAudioStream,
-      null,
-      {
-        audio: true,
-      }
-    );
+    toggleStream(audioEnabled, setAudioEnabled, audioStream, setAudioStream, {
+      audio: true,
+    });
   };
 
   const handleVideoToggle = async () => {
-    toggleStream(
-      videoEnabled,
-      setVideoEnabled,
-      videoStream,
-      setVideoStream,
-      videoRef,
-      {
-        video: true,
-      }
-    );
+    toggleStream(videoEnabled, setVideoEnabled, videoStream, setVideoStream, {
+      video: true,
+    });
   };
 
   const handleShareScreenToggle = async () => {
@@ -111,7 +110,6 @@ const CallControl = () => {
       setShareScreenEnabled,
       shareScreenStream,
       setShareScreenStream,
-      shareScreenRef,
       { video: { mediaSource: "screen" } }
     );
   };

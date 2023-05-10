@@ -41,24 +41,35 @@ const CallControl = () => {
   const iconButtonStyle = useStyleConfig("IconButton", { variant: "call" });
   const callControlStyle = useStyleConfig("Box", { variant: "callControl" });
 
+  const [audioStream, setAudioStream] = useState(null);
+
   const handleAudioToggle = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioEnabled(!audioEnabled);
       if (audioEnabled) {
-        stream.getAudioTracks()[0].enabled = false;
+        if (audioStream) {
+          const tracks = audioStream.getTracks();
+          tracks.forEach((track) => {
+            track.stop();
+          });
+          setAudioStream(null);
+          console.log("Stopped audio");
+        }
       } else {
-        stream.getAudioTracks()[0].enabled = true;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        setAudioStream(stream);
       }
     } catch (error) {
-      console.error("Error getting audio device", error);
+      console.error("Error toggling audio", error);
     }
   };
+
   const handleVideoToggle = async () => {
     try {
       setVideoEnabled(!videoEnabled);
       if (videoEnabled) {
-        // Stop the screen sharing stream and switch back to the camera stream
         const stream = videoRef.current.srcObject;
         const tracks = stream.getTracks();
         tracks.forEach((track) => {
@@ -70,7 +81,6 @@ const CallControl = () => {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
-        // Switch to the screen sharing stream
         videoRef.current.srcObject = stream;
       }
     } catch (error) {

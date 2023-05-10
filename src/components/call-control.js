@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import { Box, IconButton, HStack, Img, VStack } from "@chakra-ui/react";
 import {
   FaMicrophone,
@@ -9,6 +9,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 import { useStyleConfig } from "@chakra-ui/react";
+import { RoomContext } from "../lib/room-context";
 
 const DisplaySlashIcon = (props) => (
   /* ... existing DisplaySlashIcon component code ... */
@@ -31,21 +32,21 @@ const DisplaySlashIcon = (props) => (
   </svg>
 );
 
-const CallControl = (options) => {
-  const [audioEnabled, setAudioEnabled] = useState(
-    options.audioEnabled || false
-  );
-  const [videoEnabled, setVideoEnabled] = useState(
-    options.videoEnabled || false
-  );
-  const [shareScreenEnabled, setShareScreenEnabled] = useState(
-    options.shareScreenEnabled || false
-  );
-  const [audioStream, setAudioStream] = useState(options.audioStream || null);
-  const [videoStream, setVideoStream] = useState(options.videoStream || null);
-  const [shareScreenStream, setShareScreenStream] = useState(
-    options.shareScreenStream || null
-  );
+const CallControl = () => {
+  const {
+    audioEnabled,
+    setAudioEnabled,
+    videoEnabled,
+    setVideoEnabled,
+    shareScreenEnabled,
+    setShareScreenEnabled,
+    audioStream,
+    setAudioStream,
+    videoStream,
+    setVideoStream,
+    shareScreenStream,
+    setShareScreenStream,
+  } = useContext(RoomContext);
 
   const videoRef = useRef(null);
   const shareScreenRef = useRef(null);

@@ -1,8 +1,10 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CallControl from "../../components/call-control";
 import { firestore } from "../../lib/firebase";
+import { RoomContext } from "../../lib/room-context";
+import { P2PContext } from "../../lib/p2p-context";
 
 const Room = () => {
   const router = useRouter();
@@ -10,6 +12,10 @@ const Room = () => {
   const [roomName, setRoomName] = useState("");
   const [loading, setLoading] = useState(true);
   const [roomExists, setRoomExists] = useState(false);
+
+  const { audioEnabled, videoEnabled, audioStream, videoStream } =
+    useContext(RoomContext);
+  const { pc } = useContext(P2PContext);
 
   useEffect(() => {
     const getRoomName = async () => {
@@ -32,6 +38,32 @@ const Room = () => {
 
     getRoomName();
   }, [room]);
+
+  useEffect(() => {
+    if (audioEnabled && audioStream && pc) {
+      audioStream.getTracks().forEach((track) => {
+        pc.addTrack(track, audioStream);
+      });
+    }
+
+    if (videoEnabled && videoStream && pc) {
+      videoStream.getTracks().forEach((track) => {
+        pc.addTrack(track, videoStream);
+      });
+    }
+  }, [audioEnabled, videoEnabled, audioStream, videoStream, pc]);
+
+  useEffect(() => {
+    return () => {
+      if (pc) {
+        pc.getSenders().forEach((sender) => {
+          sender.track.stop();
+          pc.removeTrack(sender);
+        });
+      }
+    };
+  }, [pc]);
+
   const CallControlContainer = (props) => (
     <Box w="250px" borderRadius="10px" p="0">
       <CallControl {...props} />
